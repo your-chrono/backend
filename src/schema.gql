@@ -1,0 +1,15 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input LoginInput {
+  email: String!
+}
+
+type LoginResultModel {
+  token: String!
+}
+
+type Mutation {
+  login(data: LoginInput!): LoginResultModel!
+}

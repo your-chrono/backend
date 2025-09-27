@@ -1,0 +1,31 @@
+services:
+  chrono_db:
+    image: postgres:17.4-alpine
+    container_name: chrono_db_dev
+    environment:
+      POSTGRES_USER: chrono
+      POSTGRES_PASSWORD: chrono
+      POSTGRES_DB: chrono
+    ports:
+      - 4290:5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U chrono" ]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: chrono_redis
+    ports:
+      - "6279:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+volumes:
+  pg_data:
