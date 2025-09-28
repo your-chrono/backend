@@ -25,6 +25,5 @@ COPY --from=builder /home/app/dist/ ./dist/
 COPY --from=builder /home/app/node_modules/ ./node_modules/
 COPY --from=builder /home/app/node_modules/.prisma/ ./node_modules/.prisma/
 COPY --from=builder /home/app/node_modules/@prisma/ ./node_modules/@prisma/
-COPY --from=builder /home/app/src/i18n/i18n.generated.interface.ts ./src/i18n/i18n.generated.interface.ts
 
 CMD ["npm", "run", "start:prod"]
