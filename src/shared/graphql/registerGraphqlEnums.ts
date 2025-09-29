@@ -1,2 +1,1 @@
-export const registerGraphqlEnums = () => {
-};
+export const registerGraphqlEnums = () => {};
