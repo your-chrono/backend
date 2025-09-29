@@ -50,7 +50,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Detect new vulnerabilities
-        uses: AikidoSec/github-actions-workflow@v1.0.13
+        uses: AikidoSec/github-actions-workflow@47d83dbcf3e6635044c4b31cef590c1e095217cc #AikidoSec/github-actions-workflow@v1.0.13
         with:
           secret-key: ${{ secrets.AIKIDO_SECRET_KEY }}
           minimum-severity: 'LOW'
