@@ -4,6 +4,8 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { JwtSecretService } from './jwt-secret.service';
 
+const SALT = 10;
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -19,7 +21,7 @@ export class AuthService {
   }
 
   public hashPassword(password: string) {
-    return bcrypt.hash(password, 10);
+    return bcrypt.hash(password, SALT);
   }
 
   public comparePassword(password: string, hash: string) {
