@@ -1,0 +1,30 @@
+
+#!/bin/sh
+# .git-hooks/commit-msg
+# Надёжная проверка сообщения коммита через commitlint
+
+set -e
+
+MSG_FILE="$1"
+
+# Если Git не передал путь к файлу, берём стандартный
+if [ -z "$MSG_FILE" ] || [ ! -f "$MSG_FILE" ]; then
+  MSG_FILE="$(git rev-parse --git-dir)/COMMIT_EDITMSG"
+fi
+
+if [ -f "$MSG_FILE" ] && grep -qE '^(Merge|fixup!|squash!)' "$MSG_FILE"; then
+  exit 0
+fi
+
+# (Опционально) Подхватить nvm, если Node ставится через nvm и IDE не видит его
+# . "$HOME/.nvm/nvm.sh" 2>/dev/null || true
+
+if command -v npx >/dev/null 2>&1; then
+  npx --no -- commitlint --edit "$MSG_FILE"
+else
+  # Fallback, если npx недоступен
+  ./node_modules/.bin/commitlint --edit "$MSG_FILE"
+fi
+
+echo "✅ Commit message looks good."
+exit 0
