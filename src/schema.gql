@@ -3,7 +3,7 @@
 # ------------------------------------------------------
 
 input LoginInput {
-  email: String!
+  accessToken: String!
 }
 
 type LoginResultModel {

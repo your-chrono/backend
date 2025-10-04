@@ -6,9 +6,8 @@ import { DatabaseCheck } from 'src/infrastructure/health/database.check';
 import { DatabaseModule } from '../../database';
 
 @Module({
-    imports: [DatabaseModule, ConfigModule, TerminusModule],
-    controllers: [HealthController],
-    providers: [DatabaseCheck],
+  imports: [DatabaseModule, ConfigModule, TerminusModule],
+  controllers: [HealthController],
+  providers: [DatabaseCheck],
 })
-export class HealthModule {
-}
+export class HealthModule {}
