@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { JwtSecretService } from './jwt-secret.service';
+import { RoleId } from '@prisma/client';
 
 const SALT = 10;
 
@@ -13,7 +14,7 @@ export class AuthService {
     private readonly jwtSecret: JwtSecretService,
   ) {}
 
-  public login(payload: { email?: string | null; sub: string }) {
+  public login(payload: { userRoleId: RoleId; email: string; sub: string }) {
     return this.jwtService.sign(
       { ...payload },
       { secret: this.jwtSecret.secret },

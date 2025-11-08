@@ -2,6 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input GetUserInput {
+  userId: String!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
 input LoginInput {
   accessToken: String!
 }
@@ -12,4 +26,86 @@ type LoginResultModel {
 
 type Mutation {
   login(data: LoginInput!): LoginResultModel!
+  updateMyProfile(data: UpdateProfileInput!): UserModel!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+type PermissionModel {
+  action: String!
+  condition: JSON
+  id: String!
+  subject: String!
+}
+
+type ProfileModel {
+  bio: String
+  id: String!
+  pricePerHour: Int
+  rating: Float!
+  tags: [TagModel!]!
+  verified: Boolean!
+}
+
+type Query {
+  me: UserModel!
+  user(data: GetUserInput!): UserModel!
+  users(data: UsersInput!): UserConnection!
+}
+
+"""Role identifiers as defined in the Prisma schema"""
+enum RoleId {
+  ADMIN
+  EXPERT
+  USER
+}
+
+type RoleModel {
+  id: RoleId!
+  name: String!
+  permissions: [PermissionModel!]!
+}
+
+type TagModel {
+  group: String
+  id: String!
+  name: String!
+  slug: String!
+}
+
+input UpdateProfileInput {
+  bio: String
+  pricePerHour: Int
+  tagIds: [String!]
+}
+
+type UserConnection {
+  edges: [UserModelEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type UserModel {
+  createdAt: DateTime!
+  email: String!
+  id: ID!
+  profile: ProfileModel
+  role: RoleModel!
+  updatedAt: DateTime!
+}
+
+type UserModelEdge {
+  cursor: String!
+  node: UserModel!
+}
+
+input UsersInput {
+  after: String
+  first: Int!
+  search: String
 }
