@@ -12,6 +12,11 @@ import { join } from 'path';
 
 import { AuthResolver } from './auth/auth.resolver';
 import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
+import { UserResolver } from './user/user.resolver';
+import { DictionaryModule } from '../dicionary/dictionary.module';
+import { RoleResolver } from './dictionary/role.resolver';
+import { ProfileResolver } from './user/profile.resolver';
 
 @Module({})
 export class GraphqlApiModule {
@@ -46,8 +51,10 @@ export class GraphqlApiModule {
         ConfigModule,
         CqrsModule,
         AuthModule,
+        UserModule,
+        DictionaryModule,
       ],
-      providers: [AuthResolver],
+      providers: [AuthResolver, UserResolver, RoleResolver, ProfileResolver],
     };
   }
 }

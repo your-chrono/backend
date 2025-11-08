@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -19,8 +13,271 @@ model User {
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
 
-  email    String? @unique
-  password String
-
+  email            String  @unique
+  password         String
   isEmailConfirmed Boolean @default(false)
+
+  role   Role   @relation(fields: [roleId], references: [id])
+  roleId RoleId
+
+  profile Profile?
+  wallet  Wallet?
+
+  bookings Booking[] @relation("UserBookings")
+  slots    Slot[]    @relation("ExpertSlots")
+  messages Message[]
+}
+
+model Role {
+  id          RoleId       @id
+  createdAt   DateTime     @default(now())
+  name        String
+  priority    Int          @default(0)
+  permissions Permission[]
+  users       User[]
+}
+
+model Permission {
+  id        String   @id
+  createdAt DateTime @default(now())
+
+  action    String
+  subject   String
+  condition Json   @default("{}")
+
+  roles Role[]
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  bio          String?
+  rating       Float   @default(0)
+  pricePerHour Int?
+
+  verified   Boolean   @default(false)
+  verifiedAt DateTime?
+  verifiedBy String?
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+
+  tags ProfileTag[]
+
+  @@index([verified, pricePerHour])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  slug  String   @unique
+  name  String
+  group TagGroup
+
+  profiles ProfileTag[]
+
+  @@index([group, name])
+}
+
+model ProfileTag {
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id])
+
+  tagId String
+  tags  Tag    @relation(fields: [tagId], references: [id])
+
+  assignedAt DateTime @default(now())
+
+  @@id([profileId, tagId])
+  @@index([tagId, profileId])
+}
+
+model Slot {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  startTime   DateTime
+  endTime     DateTime
+  price       Int
+  format      SlotFormat @default(ONLINE)
+  description String?
+  isBooked    Boolean    @default(false)
+
+  booking Booking?
+
+  expertId String
+  expert   User   @relation("ExpertSlots", fields: [expertId], references: [id])
+
+  @@unique([expertId, startTime, endTime])
+  @@index([expertId, startTime])
+  @@index([isBooked])
+  @@index([format])
+}
+
+model Booking {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  status        BookingStatus @default(PENDING)
+  creditsLocked Int           @default(0)
+
+  chatId String @unique
+  chat   Chat   @relation(fields: [chatId], references: [id])
+
+  userId String
+  user   User   @relation("UserBookings", fields: [userId], references: [id])
+
+  slotId String @unique
+  slot   Slot   @relation(fields: [slotId], references: [id])
+
+  transaction Transaction[]
+
+  @@index([userId, status])
+  @@index([createdAt])
+}
+
+model Wallet {
+  id           String        @id @default(cuid())
+  userId       String        @unique
+  balance      Int           @default(0)
+  transactions Transaction[]
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  type        TransactionType
+  amount      Int
+  description String?
+
+  walletId String
+  wallet   Wallet @relation(fields: [walletId], references: [id])
+
+  relatedBookingId String?
+  booking          Booking? @relation(fields: [relatedBookingId], references: [id])
+
+  @@index([walletId, createdAt])
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  booking  Booking?
+  messages Message[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  text String?
+  meta Json?
+
+  replyMessageId   String?
+  replyMessage     Message?  @relation("ParentChildrenMessages", fields: [replyMessageId], references: [id])
+  childrenMessages Message[] @relation("ParentChildrenMessages")
+
+  chatId String
+  chat   Chat   @relation(fields: [chatId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  files MessageFile[]
+
+  @@index([chatId, createdAt])
+}
+
+model MessageFile {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name          String
+  fileStatus    FileStatus @default(CREATED)
+  extension     String
+  contentLength Int
+
+  messageId String?
+  message   Message? @relation(fields: [messageId], references: [id])
+}
+
+// Enums
+
+enum RoleId {
+  USER
+  EXPERT
+  ADMIN
+}
+
+enum SlotFormat {
+  ONLINE
+  OFFLINE
+  HYBRID
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+  ESCROW_LOCK
+  ESCROW_RELEASE
+  REFUND
+}
+
+enum FileStatus {
+  CREATED
+  UPLOADED
+  ERROR
+}
+
+enum TagGroup {
+  EDUCATION // Репетиторы, языки, подготовка
+  IT_DEV // Разработка, тестирование, админка
+  DESIGN // Дизайн, иллюстрация, 3D, motion
+  MARKETING // SMM, SEO, контекст, копирайт
+  BUSINESS // Консалтинг, управление, HR
+  FINANCE // Бухгалтерия, налоги, фин. учёт
+  LEGAL // Юристы, договоры, консультации
+  TRANSLATION // Переводы, локализация
+  PHOTO_VIDEO // Фото, видео, продакшн, монтаж
+  MUSIC // Музыка, вокал, звук
+  SPORT // Фитнес, йога, тренеры
+  BEAUTY_HEALTH // Красота, массаж, здоровье
+  HOME_REPAIR // Ремонт и строительство
+  CLEANING // Уборка, клининг
+  AUTO // Автосервис, шиномонтаж, детейлинг
+  EVENTS // Мероприятия, ведущие, организация
+  REAL_ESTATE // Недвижимость, риэлторы, переезды
+  KIDS // Няни, занятия для детей
+  PETS // Услуги для животных
+  GARDEN // Сад, дача, озеленение
+  DELIVERY // Курьеры, мелкие поручения
+  HOBBIES // Хобби, рукоделие, игры
+  OTHER // Другое
 }

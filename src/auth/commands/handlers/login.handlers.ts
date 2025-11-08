@@ -4,6 +4,7 @@ import { YandexOAuthService } from '../../yandex-oauth.service';
 import { AuthService } from '../../auth.service';
 import { PrismaService } from '../../../database';
 import { nanoid } from 'nanoid';
+import { RoleId } from '@prisma/client';
 
 @CommandHandler(LoginCommand)
 export class LoginHandler
@@ -26,6 +27,7 @@ export class LoginHandler
       token: this.authService.login({
         email,
         sub: user.id,
+        userRoleId: user.roleId,
       }),
     };
   }
@@ -44,6 +46,7 @@ export class LoginHandler
         email,
         password: await this.authService.hashPassword(nanoid()),
         isEmailConfirmed: true,
+        roleId: RoleId.USER,
       },
     });
   }
