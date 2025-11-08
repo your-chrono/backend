@@ -94,7 +94,7 @@ export class UpdateProfileHandler
       if (uniqueTagIds.length) {
         const tags = await this.prisma.tag.findMany({
           where: {
-            id: { in: uniqueTagIds as string[] },
+            id: { in: uniqueTagIds },
             isDeleted: false,
           },
           select: { id: true },
