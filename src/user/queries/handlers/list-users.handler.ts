@@ -46,20 +46,13 @@ export class ListUsersHandler implements IQueryHandler<ListUsersQuery> {
       isDeleted: false,
     };
 
-    if (!query) return where;
+    if (!query) {
+      return where;
+    }
 
     where.OR = [
       { email: { contains: query, mode: 'insensitive' } },
       { profile: { bio: { contains: query, mode: 'insensitive' } } },
-      {
-        profile: {
-          tags: {
-            some: {
-              tag: { name: { contains: query, mode: 'insensitive' } },
-            },
-          },
-        },
-      },
     ];
 
     return where;

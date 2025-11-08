@@ -18,13 +18,12 @@ export class ResolveTagsByProfileIdHandler
   async execute({
     data,
   }: ResolveTagsByProfileIdQuery): Promise<ResolveTagsByProfileIdQueryReturnType> {
-    const tags = await this.prisma.profileTag.findMany({
-      where: { profileId: data.profileId },
-      include: {
-        tag: true,
+    return this.prisma.tag.findMany({
+      where: {
+        profiles: {
+          some: { profileId: data.profileId },
+        },
       },
     });
-
-    return tags.map((pt) => pt.tag);
   }
 }
