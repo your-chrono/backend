@@ -8,7 +8,7 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { GraphQLModule } from '@nestjs/graphql';
-import { join } from 'path';
+import { join } from 'node:path';
 
 import { AuthResolver } from './auth/auth.resolver';
 import { AuthModule } from '../auth/auth.module';
