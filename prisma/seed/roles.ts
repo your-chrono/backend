@@ -9,8 +9,23 @@ export async function roles(prisma: PrismaClient): Promise<void> {
   const roles: RoleWithPermissions[] = [
     {
       id: RoleId.USER,
-      name: 'Администратор',
-      permissions: [PermissionId.view_user, PermissionId.update_user],
+      name: 'Пользователь',
+      permissions: [
+        PermissionId.view_user,
+        PermissionId.update_user,
+        PermissionId.view_slot,
+        PermissionId.update_slot,
+      ],
+    },
+    {
+      id: RoleId.EXPERT,
+      name: 'Эксперт',
+      permissions: [
+        PermissionId.view_user,
+        PermissionId.update_user,
+        PermissionId.view_slot,
+        PermissionId.update_slot,
+      ],
     },
   ];
 

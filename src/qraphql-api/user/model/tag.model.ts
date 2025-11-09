@@ -1,4 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { TagGroup } from '@prisma/client';
 
 @ObjectType()
 export class TagModel {
@@ -11,6 +12,6 @@ export class TagModel {
   @Field()
   name: string;
 
-  @Field({ nullable: true })
-  group?: string;
+  @Field(() => TagGroup, { nullable: true })
+  group?: TagGroup;
 }
