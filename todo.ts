@@ -56,10 +56,9 @@
 // - Credits locked during booking (creditsLocked field)
 //
 // 6. Chat for coordination (PARTIALLY IMPLEMENTED)
-// - Chat model exists in Prisma schema
-// - Message model with relations to Chat and User
-// - BUT No GraphQL resolvers for chat functionality visible in the codebase
-// - Messages have text field and file attachments support
+// - Chat and Message models exist in Prisma schema
+// - GraphQL resolvers + CQRS handlers now live under src/graphql-api/chat and src/chat
+// - Messages have text field and file attachment slots, but no upload flow yet
 //
 // 7. Booking history ✓ (IMPLEMENTED)
 // - myBookings query with pagination
@@ -67,8 +66,7 @@
 // - Transaction history available via myTransactions query
 // - Booking status tracking (PENDING, CONFIRMED, CANCELLED, COMPLETED)
 //
-// Status for MVP-features task: 6/7 features fully implemented, 1 partially implemented. The chat functionality exists in the database schema but is not exposed
-// through GraphQL resolvers in the current codebase.
+// Status for MVP-features task: 6/7 features fully implemented, 1 partially implemented. Chat is now exposed through GraphQL, but lacks file uploads and real-time delivery.
 
 //
 // User Stories Analysis
@@ -120,7 +118,7 @@
 //
 // US-040 — Chat for Booking
 //                   - ⚠️ PARTIALLY IMPLEMENTED: Chat and Message models exist in schema
-// - BUT no GraphQL resolvers for chat functionality found in current codebase
+// - GraphQL resolvers/commands exist, but attachments + realtime notifications are still missing
 //
 // US-050 — Viewing Balance and History
 // - ✅ IMPLEMENTED: myWallet query for balance, myTransactions for history
@@ -192,8 +190,8 @@
 // - ✅ Notification system (likely through the infrastructure layer)
 //
 // 6. Chat
-// - ⚠️ PARTIALLY IMPLEMENTED: Database models exist (Chat, Message) but no GraphQL resolvers found
-// - ⚠️ PARTIAL: Real-time messaging may be implemented separately
+// - ⚠️ PARTIALLY IMPLEMENTED: Database models + GraphQL resolvers exist, but no media uploads or delivery guarantees
+// - ⚠️ PARTIAL: Real-time messaging/notifications may be implemented separately
 // - ⚠️ PARTIAL: Only between participants - this is supported in schema
 //
 // 7. Wallet/Credits
@@ -210,7 +208,7 @@
 // Key Observations:
 //
 //     The implementation covers most of the acceptance criteria well. The main gaps are:
-//     1. Chat functionality - exists in database but not exposed via GraphQL
+//     1. Chat functionality - lacks attachments, read tracking, and realtime delivery
 // 2. Advanced filtering - basic filtering exists but may need enhancement
 // 3. Real-time notifications - may be implemented separately from the backend
 // 4. Visual elements - UI/UX elements like "Buy more credits" button are frontend concerns
@@ -275,8 +273,8 @@
 //
 //     1. Real-Time Chat System
 // - Documentation: US-040 - Chat for booking coordination
-// - Missing: GraphQL resolvers for chat functionality
-// - Current State: Database models exist (Chat, Message) but no API endpoints
+// - Current Gap: No subscriptions, delivery guarantees, or attachment uploads
+// - Current State: Database models + GraphQL API exist, but lack real-time transport
 // - Impact: Critical for user-to-user communication during bookings
 //
 // 2. Notification System

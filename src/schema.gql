@@ -42,6 +42,13 @@ input CancelBookingInput {
   reason: String
 }
 
+type ChatModel {
+  bookingId: ID
+  createdAt: DateTime!
+  id: ID!
+  updatedAt: DateTime!
+}
+
 input CompleteBookingInput {
   bookingId: ID!
   expectedVersion: DateTime
@@ -54,6 +61,13 @@ input ConfirmBookingInput {
 
 input CreateBookingInput {
   slotId: ID!
+}
+
+input CreateMessageInput {
+  chatId: ID!
+  meta: JSON
+  replyMessageId: ID
+  text: String
 }
 
 input CreateSlotInput {
@@ -69,12 +83,30 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+input DeleteMessageInput {
+  messageId: ID!
+}
+
 input DeleteSlotInput {
   slotId: ID!
 }
 
 input GetBookingInput {
   bookingId: ID!
+}
+
+input GetChatInput {
+  chatId: ID!
+}
+
+input GetMessageInput {
+  messageId: ID!
+}
+
+input GetMessagesInput {
+  after: String
+  chatId: ID!
+  first: Int!
 }
 
 input GetSlotInput {
@@ -122,17 +154,44 @@ type LoginResultModel {
   token: String!
 }
 
+type MessageModel {
+  chatId: ID!
+  createdAt: DateTime!
+  id: ID!
+  isDeleted: Boolean!
+  meta: JSON
+  replyMessage: MessageModel
+  replyMessageId: ID
+  text: String
+  updatedAt: DateTime!
+  userId: ID!
+}
+
+type MessageModelEdge {
+  cursor: String!
+  node: MessageModel!
+}
+
+type MessagesConnection {
+  edges: [MessageModelEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type Mutation {
   cancelMyBooking(data: CancelBookingInput!): BookingModel!
   completeMyBooking(data: CompleteBookingInput!): BookingModel!
   confirmMyBooking(data: ConfirmBookingInput!): BookingModel!
+  createMessage(data: CreateMessageInput!): MessageModel!
   createMyBooking(data: CreateBookingInput!): BookingModel!
   createMySlot(data: CreateSlotInput!): SlotModel!
+  deleteMessage(data: DeleteMessageInput!): Boolean!
   deleteMySlot(data: DeleteSlotInput!): SlotMutationPayload!
   login(data: LoginInput!): LoginResultModel!
   setSlotBookingState(data: SetSlotBookingStateInput!): SlotModel!
   syncMySlots(data: SyncSlotsInput!): SyncSlotsPayload!
   topUpMyWallet(data: TopUpWalletInput!): WalletModel!
+  updateMessage(data: UpdateMessageInput!): MessageModel!
   updateMyProfile(data: UpdateProfileInput!): UserModel!
   updateMySlot(data: UpdateSlotInput!): SlotModel!
   withdrawMyWallet(data: WithdrawWalletInput!): WalletModel!
@@ -163,7 +222,10 @@ type ProfileModel {
 
 type Query {
   booking(data: GetBookingInput!): BookingModel!
+  chat(data: GetChatInput!): ChatModel!
+  chatMessages(data: GetMessagesInput!): MessagesConnection!
   me: UserModel!
+  message(data: GetMessageInput!): MessageModel!
   myBookings(data: ListMyBookingsInput!): BookingConnection!
   myTransactions(data: ListMyTransactionsInput!): TransactionConnection!
   myWallet: WalletModel!
@@ -316,6 +378,11 @@ enum TransactionType {
   ESCROW_LOCK
   ESCROW_RELEASE
   REFUND
+}
+
+input UpdateMessageInput {
+  messageId: ID!
+  text: String
 }
 
 input UpdateProfileInput {
