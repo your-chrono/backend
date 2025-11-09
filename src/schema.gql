@@ -2,10 +2,22 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input CreateSlotInput {
+  description: String
+  endTime: DateTime!
+  format: SlotFormat!
+  price: Int!
+  startTime: DateTime!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+input DeleteSlotInput {
+  slotId: ID!
+}
 
 input GetSlotInput {
   slotId: ID!
@@ -40,8 +52,13 @@ type LoginResultModel {
 }
 
 type Mutation {
+  createMySlot(data: CreateSlotInput!): SlotModel!
+  deleteMySlot(data: DeleteSlotInput!): SlotMutationPayload!
   login(data: LoginInput!): LoginResultModel!
+  setSlotBookingState(data: SetSlotBookingStateInput!): SlotModel!
+  syncMySlots(data: SyncSlotsInput!): SyncSlotsPayload!
   updateMyProfile(data: UpdateProfileInput!): UserModel!
+  updateMySlot(data: UpdateSlotInput!): SlotModel!
 }
 
 type PageInfo {
@@ -88,6 +105,12 @@ type RoleModel {
   permissions: [PermissionModel!]!
 }
 
+input SetSlotBookingStateInput {
+  expectedVersion: DateTime
+  isBooked: Boolean!
+  slotId: ID!
+}
+
 type SlotConnection {
   edges: [SlotModelEdge!]!
   pageInfo: PageInfo!
@@ -116,6 +139,34 @@ type SlotModel {
 type SlotModelEdge {
   cursor: String!
   node: SlotModel!
+}
+
+type SlotMutationPayload {
+  slotId: ID!
+}
+
+input SyncSlotPayloadInput {
+  description: String
+  endTime: DateTime!
+  format: SlotFormat!
+  price: Int!
+  startTime: DateTime!
+}
+
+input SyncSlotsInput {
+  slots: [SyncSlotPayloadInput!]!
+  window: SyncSlotsWindowInput!
+}
+
+type SyncSlotsPayload {
+  created: Int!
+  deleted: Int!
+  updated: Int!
+}
+
+input SyncSlotsWindowInput {
+  from: DateTime!
+  to: DateTime!
 }
 
 enum TagGroup {
@@ -155,6 +206,15 @@ input UpdateProfileInput {
   bio: String
   pricePerHour: Int
   tagIds: [String!]
+}
+
+input UpdateSlotInput {
+  description: String
+  endTime: DateTime
+  format: SlotFormat
+  price: Int
+  slotId: ID!
+  startTime: DateTime
 }
 
 type UserConnection {
