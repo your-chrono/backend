@@ -1,11 +1,15 @@
 import {
+  CancelBookingHandler,
+  CompleteBookingHandler,
+  ConfirmBookingHandler,
   CreateBookingHandler,
-  UpdateBookingStatusHandler,
 } from './handlers';
 
 export const BOOKING_COMMANDS = [
   CreateBookingHandler,
-  UpdateBookingStatusHandler,
+  ConfirmBookingHandler,
+  CancelBookingHandler,
+  CompleteBookingHandler,
 ];
 
 export * from './impl';

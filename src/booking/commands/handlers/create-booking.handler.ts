@@ -19,6 +19,7 @@ export class CreateBookingHandler
       await this.ensureUserExists(data.userId);
 
       const slot = await this.findSlotOrThrow(data.slotId);
+      const wallet = await this.getOrCreateWallet(data.userId);
 
       if (slot.expertId === data.userId) {
         throw new BadRequestException('Cannot book own slot');
@@ -27,6 +28,8 @@ export class CreateBookingHandler
       if (slot.isBooked) {
         throw new ConflictException('Slot already booked');
       }
+
+      this.ensureSufficientBalance(wallet.balance, slot.price);
 
       const existingBooking = await this.prisma.booking.findFirst({
         where: {
@@ -54,6 +57,12 @@ export class CreateBookingHandler
           status: BookingStatus.PENDING,
         },
         select: { id: true },
+      });
+
+      await this.lockCredits({
+        walletId: wallet.id,
+        amount: slot.price,
+        bookingId: booking.id,
       });
 
       await this.prisma.slot.update({

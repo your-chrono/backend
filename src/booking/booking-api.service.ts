@@ -4,9 +4,15 @@ import {
   CreateBookingCommand,
   CreateBookingCommandData,
   CreateBookingCommandReturnType,
-  UpdateBookingStatusCommand,
-  UpdateBookingStatusCommandData,
-  UpdateBookingStatusCommandReturnType,
+  ConfirmBookingCommand,
+  ConfirmBookingCommandData,
+  ConfirmBookingCommandReturnType,
+  CancelBookingCommand,
+  CancelBookingCommandData,
+  CancelBookingCommandReturnType,
+  CompleteBookingCommand,
+  CompleteBookingCommandData,
+  CompleteBookingCommandReturnType,
 } from './commands';
 import {
   GetBookingQuery,
@@ -46,11 +52,29 @@ export class BookingApiService {
     return this.getBooking({ bookingId: result.bookingId });
   }
 
-  async updateBookingStatus(data: UpdateBookingStatusCommandData) {
+  async confirmBooking(data: ConfirmBookingCommandData) {
     const result = await this.commandBus.execute<
-      UpdateBookingStatusCommand,
-      UpdateBookingStatusCommandReturnType
-    >(new UpdateBookingStatusCommand(data));
+      ConfirmBookingCommand,
+      ConfirmBookingCommandReturnType
+    >(new ConfirmBookingCommand(data));
+
+    return this.getBooking({ bookingId: result.bookingId });
+  }
+
+  async cancelBooking(data: CancelBookingCommandData) {
+    const result = await this.commandBus.execute<
+      CancelBookingCommand,
+      CancelBookingCommandReturnType
+    >(new CancelBookingCommand(data));
+
+    return this.getBooking({ bookingId: result.bookingId });
+  }
+
+  async completeBooking(data: CompleteBookingCommandData) {
+    const result = await this.commandBus.execute<
+      CompleteBookingCommand,
+      CompleteBookingCommandReturnType
+    >(new CompleteBookingCommand(data));
 
     return this.getBooking({ bookingId: result.bookingId });
   }
