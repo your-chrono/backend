@@ -36,6 +36,22 @@ enum BookingStatus {
   PENDING
 }
 
+input CancelBookingInput {
+  bookingId: ID!
+  expectedVersion: DateTime
+  reason: String
+}
+
+input CompleteBookingInput {
+  bookingId: ID!
+  expectedVersion: DateTime
+}
+
+input ConfirmBookingInput {
+  bookingId: ID!
+  expectedVersion: DateTime
+}
+
 input CreateBookingInput {
   slotId: ID!
 }
@@ -107,6 +123,9 @@ type LoginResultModel {
 }
 
 type Mutation {
+  cancelMyBooking(data: CancelBookingInput!): BookingModel!
+  completeMyBooking(data: CompleteBookingInput!): BookingModel!
+  confirmMyBooking(data: ConfirmBookingInput!): BookingModel!
   createMyBooking(data: CreateBookingInput!): BookingModel!
   createMySlot(data: CreateSlotInput!): SlotModel!
   deleteMySlot(data: DeleteSlotInput!): SlotMutationPayload!
@@ -114,7 +133,6 @@ type Mutation {
   setSlotBookingState(data: SetSlotBookingStateInput!): SlotModel!
   syncMySlots(data: SyncSlotsInput!): SyncSlotsPayload!
   topUpMyWallet(data: TopUpWalletInput!): WalletModel!
-  updateMyBookingStatus(data: UpdateBookingStatusInput!): BookingModel!
   updateMyProfile(data: UpdateProfileInput!): UserModel!
   updateMySlot(data: UpdateSlotInput!): SlotModel!
   withdrawMyWallet(data: WithdrawWalletInput!): WalletModel!
@@ -298,12 +316,6 @@ enum TransactionType {
   ESCROW_LOCK
   ESCROW_RELEASE
   REFUND
-}
-
-input UpdateBookingStatusInput {
-  bookingId: ID!
-  expectedVersion: DateTime
-  status: BookingStatus!
 }
 
 input UpdateProfileInput {

@@ -6,10 +6,12 @@ import { CurrentUser } from '../current-user.decorator';
 import { UserType } from '../../auth/types';
 import {
   BookingListScope,
+  CancelBookingInput,
+  CompleteBookingInput,
+  ConfirmBookingInput,
   CreateBookingInput,
   GetBookingInput,
   ListMyBookingsInput,
-  UpdateBookingStatusInput,
 } from './input';
 import { BookingConnection, BookingModel } from './model';
 import { GetBookingQueryReturnType } from '../../booking/queries';
@@ -67,13 +69,39 @@ export class BookingResolver {
   }
 
   @Mutation(() => BookingModel)
-  async updateMyBookingStatus(
+  async confirmMyBooking(
     @CurrentUser() user: UserType,
-    @Args('data') data: UpdateBookingStatusInput,
+    @Args('data') data: ConfirmBookingInput,
   ) {
-    const booking = await this.bookingApi.updateBookingStatus({
+    const booking = await this.bookingApi.confirmBooking({
       ...data,
       requesterId: user.userId,
+    });
+
+    return this.stripSlot(booking);
+  }
+
+  @Mutation(() => BookingModel)
+  async cancelMyBooking(
+    @CurrentUser() user: UserType,
+    @Args('data') data: CancelBookingInput,
+  ) {
+    const booking = await this.bookingApi.cancelBooking({
+      ...data,
+      requesterId: user.userId,
+    });
+
+    return this.stripSlot(booking);
+  }
+
+  @Mutation(() => BookingModel)
+  async completeMyBooking(
+    @CurrentUser() user: UserType,
+    @Args('data') data: CompleteBookingInput,
+  ) {
+    const booking = await this.bookingApi.completeBooking({
+      ...data,
+      performedBy: user.userId,
     });
 
     return this.stripSlot(booking);
