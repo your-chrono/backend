@@ -15,4 +15,5 @@ export enum PermissionAction {
 
 export enum PermissionSubject {
   user = 'user',
+  slot = 'slot',
 }

@@ -4,6 +4,9 @@ import { PermissionAction, PermissionSubject } from '../../src/auth/constant';
 export enum PermissionId {
   view_user = 'view_user',
   update_user = 'update_user',
+
+  view_slot = 'view_slot',
+  update_slot = 'update_slot',
 }
 
 export async function permissions(prisma: PrismaClient): Promise<void> {
@@ -22,6 +25,19 @@ export async function permissions(prisma: PrismaClient): Promise<void> {
       id: PermissionId.update_user,
       action: PermissionAction.update,
       subject: PermissionSubject.user,
+      condition: {},
+    },
+    // Slot
+    {
+      id: PermissionId.view_slot,
+      action: PermissionAction.view,
+      subject: PermissionSubject.slot,
+      condition: {},
+    },
+    {
+      id: PermissionId.update_slot,
+      action: PermissionAction.update,
+      subject: PermissionSubject.slot,
       condition: {},
     },
   ];
