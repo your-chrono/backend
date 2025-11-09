@@ -2,6 +2,44 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type BookingConnection {
+  edges: [BookingModelEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+enum BookingListScope {
+  CLIENT
+  EXPERT
+}
+
+type BookingModel {
+  chatId: ID!
+  createdAt: DateTime!
+  creditsLocked: Int!
+  id: ID!
+  slotId: ID!
+  status: BookingStatus!
+  updatedAt: DateTime!
+  userId: ID!
+}
+
+type BookingModelEdge {
+  cursor: String!
+  node: BookingModel!
+}
+
+enum BookingStatus {
+  CANCELLED
+  COMPLETED
+  CONFIRMED
+  PENDING
+}
+
+input CreateBookingInput {
+  slotId: ID!
+}
+
 input CreateSlotInput {
   description: String
   endTime: DateTime!
@@ -19,6 +57,10 @@ input DeleteSlotInput {
   slotId: ID!
 }
 
+input GetBookingInput {
+  bookingId: ID!
+}
+
 input GetSlotInput {
   slotId: ID!
 }
@@ -31,6 +73,13 @@ input GetUserInput {
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+input ListMyBookingsInput {
+  after: String
+  first: Int!
+  scope: BookingListScope! = CLIENT
+  status: BookingStatus
+}
 
 input ListPublicSlotsInput {
   after: String
@@ -52,11 +101,13 @@ type LoginResultModel {
 }
 
 type Mutation {
+  createMyBooking(data: CreateBookingInput!): BookingModel!
   createMySlot(data: CreateSlotInput!): SlotModel!
   deleteMySlot(data: DeleteSlotInput!): SlotMutationPayload!
   login(data: LoginInput!): LoginResultModel!
   setSlotBookingState(data: SetSlotBookingStateInput!): SlotModel!
   syncMySlots(data: SyncSlotsInput!): SyncSlotsPayload!
+  updateMyBookingStatus(data: UpdateBookingStatusInput!): BookingModel!
   updateMyProfile(data: UpdateProfileInput!): UserModel!
   updateMySlot(data: UpdateSlotInput!): SlotModel!
 }
@@ -85,7 +136,9 @@ type ProfileModel {
 }
 
 type Query {
+  booking(data: GetBookingInput!): BookingModel!
   me: UserModel!
+  myBookings(data: ListMyBookingsInput!): BookingConnection!
   publicSlots(data: ListPublicSlotsInput!): SlotConnection!
   slot(data: GetSlotInput!): SlotModel!
   user(data: GetUserInput!): UserModel!
@@ -200,6 +253,12 @@ type TagModel {
   id: String!
   name: String!
   slug: String!
+}
+
+input UpdateBookingStatusInput {
+  bookingId: ID!
+  expectedVersion: DateTime
+  status: BookingStatus!
 }
 
 input UpdateProfileInput {
