@@ -4,7 +4,7 @@ import { HealthModule } from './infrastructure/health/health.module';
 import { DatabaseModule } from './database';
 import { BullModule } from '@nestjs/bullmq';
 import { ScheduleModule } from '@nestjs/schedule';
-import { GraphqlApiModule } from './qraphql-api/graphql-api.module';
+import { GraphqlApiModule } from './graphql-api/graphql-api.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({

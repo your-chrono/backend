@@ -1,6 +1,6 @@
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { RoleModel } from './model';
-import { DictionaryApiService } from '../../dicionary/dictionary-api.service';
+import { DictionaryApiService } from '../../dictionary/dictionary-api.service';
 
 @Resolver(() => RoleModel)
 export class RoleResolver {

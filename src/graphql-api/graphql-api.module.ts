@@ -8,13 +8,13 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { GraphQLModule } from '@nestjs/graphql';
-import { join } from 'path';
+import { join } from 'node:path';
 
 import { AuthResolver } from './auth/auth.resolver';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
 import { UserResolver } from './user/user.resolver';
-import { DictionaryModule } from '../dicionary/dictionary.module';
+import { DictionaryModule } from '../dictionary/dictionary.module';
 import { RoleResolver } from './dictionary/role.resolver';
 import { ProfileResolver } from './user/profile.resolver';
 import { SlotModule } from '../slot/slot.module';
