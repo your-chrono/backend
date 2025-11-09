@@ -19,7 +19,7 @@ export class CreateBookingHandler
       await this.ensureUserExists(data.userId);
 
       const slot = await this.findSlotOrThrow(data.slotId);
-      const wallet = await this.getOrCreateWallet(data.userId);
+      const wallet = await this.ensureWallet(data.userId);
 
       if (slot.expertId === data.userId) {
         throw new BadRequestException('Cannot book own slot');
@@ -59,8 +59,8 @@ export class CreateBookingHandler
         select: { id: true },
       });
 
-      await this.lockCredits({
-        walletId: wallet.id,
+      await this.lockBookingCredits({
+        userId: data.userId,
         amount: slot.price,
         bookingId: booking.id,
       });

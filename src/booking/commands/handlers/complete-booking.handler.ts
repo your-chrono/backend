@@ -42,7 +42,7 @@ export class CompleteBookingHandler
       }
 
       if (booking.creditsLocked > 0) {
-        await this.releaseCreditsToExpert({
+        await this.releaseBookingCredits({
           expertId: booking.slot.expertId,
           amount: booking.creditsLocked,
           bookingId: booking.id,

@@ -4,12 +4,16 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma, TransactionType } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { TransactionPrismaService } from '../../../database/transaction-prisma.service';
+import { WalletLedgerService } from '../../../wallet/services/wallet-ledger.service';
 
 @Injectable()
 export abstract class BaseBookingHandler {
-  constructor(protected readonly transaction: TransactionPrismaService) {}
+  constructor(
+    protected readonly transaction: TransactionPrismaService,
+    protected readonly walletLedger: WalletLedgerService,
+  ) {}
 
   protected get prisma() {
     return this.transaction.getTransaction();
@@ -91,13 +95,8 @@ export abstract class BaseBookingHandler {
     }
   }
 
-  protected async getOrCreateWallet(userId: string) {
-    return this.prisma.wallet.upsert({
-      where: { userId },
-      update: {},
-      create: { userId },
-      select: { id: true, balance: true, userId: true },
-    });
+  protected async ensureWallet(userId: string) {
+    return this.walletLedger.ensureWallet(this.prisma, userId);
   }
 
   protected ensureSufficientBalance(balance: number, amount: number) {
@@ -110,71 +109,30 @@ export abstract class BaseBookingHandler {
     }
   }
 
-  protected async lockCredits(params: {
-    walletId: string;
+  protected lockBookingCredits(params: {
+    userId: string;
     amount: number;
     bookingId: string;
     description?: string;
   }) {
-    await this.prisma.wallet.update({
-      where: { id: params.walletId },
-      data: { balance: { decrement: params.amount } },
-    });
-
-    await this.prisma.transaction.create({
-      data: {
-        walletId: params.walletId,
-        type: TransactionType.ESCROW_LOCK,
-        amount: params.amount,
-        relatedBookingId: params.bookingId,
-        description: params.description ?? null,
-      },
-    });
+    return this.walletLedger.lockCredits(this.prisma, params);
   }
 
-  protected async refundCredits(params: {
-    walletId: string;
+  protected refundBookingCredits(params: {
+    userId: string;
     amount: number;
     bookingId: string;
     description?: string;
   }) {
-    await this.prisma.wallet.update({
-      where: { id: params.walletId },
-      data: { balance: { increment: params.amount } },
-    });
-
-    await this.prisma.transaction.create({
-      data: {
-        walletId: params.walletId,
-        type: TransactionType.REFUND,
-        amount: params.amount,
-        relatedBookingId: params.bookingId,
-        description: params.description ?? null,
-      },
-    });
+    return this.walletLedger.refundCredits(this.prisma, params);
   }
 
-  protected async releaseCreditsToExpert(params: {
+  protected releaseBookingCredits(params: {
     expertId: string;
     amount: number;
     bookingId: string;
     description?: string;
   }) {
-    const expertWallet = await this.getOrCreateWallet(params.expertId);
-
-    await this.prisma.wallet.update({
-      where: { id: expertWallet.id },
-      data: { balance: { increment: params.amount } },
-    });
-
-    await this.prisma.transaction.create({
-      data: {
-        walletId: expertWallet.id,
-        type: TransactionType.ESCROW_RELEASE,
-        amount: params.amount,
-        relatedBookingId: params.bookingId,
-        description: params.description ?? null,
-      },
-    });
+    return this.walletLedger.releaseCredits(this.prisma, params);
   }
 }
