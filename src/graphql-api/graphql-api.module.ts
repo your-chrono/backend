@@ -23,6 +23,9 @@ import { BookingModule } from '../booking/booking.module';
 import { BookingResolver } from './booking/booking.resolver';
 import { WalletModule } from '../wallet/wallet.module';
 import { WalletResolver } from './wallet/wallet.resolver';
+import { ChatModule } from '../chat/chat.module';
+import { ChatResolver } from './chat/chat.resolver';
+import { MessageResolver } from './chat/message.resolver';
 
 @Module({})
 export class GraphqlApiModule {
@@ -62,6 +65,7 @@ export class GraphqlApiModule {
         BookingModule,
         WalletModule,
         DictionaryModule,
+        ChatModule,
       ],
       providers: [
         AuthResolver,
@@ -71,6 +75,8 @@ export class GraphqlApiModule {
         SlotResolver,
         BookingResolver,
         WalletResolver,
+        ChatResolver,
+        MessageResolver,
       ],
     };
   }
