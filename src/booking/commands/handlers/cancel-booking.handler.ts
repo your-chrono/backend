@@ -46,11 +46,9 @@ export class CancelBookingHandler
         throw new BadRequestException('Unsupported booking status');
       }
 
-      const wallet = await this.getOrCreateWallet(booking.userId);
-
       if (booking.creditsLocked > 0) {
-        await this.refundCredits({
-          walletId: wallet.id,
+        await this.refundBookingCredits({
+          userId: booking.userId,
           amount: booking.creditsLocked,
           bookingId: booking.id,
           description: data.reason,
