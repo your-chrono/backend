@@ -81,6 +81,12 @@ input ListMyBookingsInput {
   status: BookingStatus
 }
 
+input ListMyTransactionsInput {
+  after: String
+  first: Int!
+  type: TransactionType
+}
+
 input ListPublicSlotsInput {
   after: String
   expertId: ID!
@@ -107,9 +113,11 @@ type Mutation {
   login(data: LoginInput!): LoginResultModel!
   setSlotBookingState(data: SetSlotBookingStateInput!): SlotModel!
   syncMySlots(data: SyncSlotsInput!): SyncSlotsPayload!
+  topUpMyWallet(data: TopUpWalletInput!): WalletModel!
   updateMyBookingStatus(data: UpdateBookingStatusInput!): BookingModel!
   updateMyProfile(data: UpdateProfileInput!): UserModel!
   updateMySlot(data: UpdateSlotInput!): SlotModel!
+  withdrawMyWallet(data: WithdrawWalletInput!): WalletModel!
 }
 
 type PageInfo {
@@ -139,6 +147,8 @@ type Query {
   booking(data: GetBookingInput!): BookingModel!
   me: UserModel!
   myBookings(data: ListMyBookingsInput!): BookingConnection!
+  myTransactions(data: ListMyTransactionsInput!): TransactionConnection!
+  myWallet: WalletModel!
   publicSlots(data: ListPublicSlotsInput!): SlotConnection!
   slot(data: GetSlotInput!): SlotModel!
   user(data: GetUserInput!): UserModel!
@@ -255,6 +265,41 @@ type TagModel {
   slug: String!
 }
 
+input TopUpWalletInput {
+  amount: Int!
+  description: String
+}
+
+type TransactionConnection {
+  edges: [TransactionModelEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type TransactionModel {
+  amount: Int!
+  createdAt: DateTime!
+  description: String
+  id: ID!
+  relatedBookingId: ID
+  type: TransactionType!
+  updatedAt: DateTime!
+  walletId: ID!
+}
+
+type TransactionModelEdge {
+  cursor: String!
+  node: TransactionModel!
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+  ESCROW_LOCK
+  ESCROW_RELEASE
+  REFUND
+}
+
 input UpdateBookingStatusInput {
   bookingId: ID!
   expectedVersion: DateTime
@@ -300,4 +345,17 @@ input UsersInput {
   after: String
   first: Int!
   search: String
+}
+
+type WalletModel {
+  balance: Int!
+  createdAt: DateTime!
+  id: ID!
+  updatedAt: DateTime!
+  userId: ID!
+}
+
+input WithdrawWalletInput {
+  amount: Int!
+  description: String
 }
