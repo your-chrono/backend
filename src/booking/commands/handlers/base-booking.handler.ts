@@ -21,7 +21,7 @@ export abstract class BaseBookingHandler {
 
   protected runInTransaction<T>(handler: () => Promise<T>) {
     return this.transaction.run(handler, {
-      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead,
     });
   }
 
@@ -45,6 +45,8 @@ export abstract class BaseBookingHandler {
         isBooked: true,
         expertId: true,
         price: true,
+        startTime: true,
+        endTime: true,
       },
     });
 
@@ -70,6 +72,7 @@ export abstract class BaseBookingHandler {
           select: {
             expertId: true,
             price: true,
+            isDeleted: true,
           },
         },
       },
@@ -77,6 +80,10 @@ export abstract class BaseBookingHandler {
 
     if (!booking || booking.isDeleted) {
       throw new NotFoundException('Booking not found');
+    }
+
+    if (booking.slot.isDeleted) {
+      throw new NotFoundException('Associated slot has been deleted');
     }
 
     return booking;
@@ -134,5 +141,13 @@ export abstract class BaseBookingHandler {
     description?: string;
   }) {
     return this.walletLedger.releaseCredits(this.prisma, params);
+  }
+
+  protected ensureValidExpectedVersion(expectedVersion?: Date) {
+    if (expectedVersion !== undefined) {
+      if (!expectedVersion || isNaN(expectedVersion.getTime())) {
+        throw new BadRequestException('expectedVersion must be a valid date');
+      }
+    }
   }
 }

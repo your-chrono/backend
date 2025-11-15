@@ -26,9 +26,15 @@ export class BookingResolver {
     @CurrentUser() user: UserType,
     @Args('data') data: GetBookingInput,
   ) {
-    const booking = await this.bookingApi.getBooking(data);
+    const booking = await this.bookingApi.getBooking(data).catch(() => null);
 
-    this.ensureAccess(booking, user.userId);
+    if (
+      !booking ||
+      (booking.userId !== user.userId &&
+        booking.slot.expertId !== user.userId)
+    ) {
+      throw new ForbiddenException('Access denied');
+    }
 
     return this.stripSlot(booking);
   }
@@ -44,6 +50,7 @@ export class BookingResolver {
         status: data.status,
         first: data.first,
         after: data.after,
+        requesterId: user.userId,
       });
     }
 
@@ -52,6 +59,7 @@ export class BookingResolver {
       status: data.status,
       first: data.first,
       after: data.after,
+      requesterId: user.userId,
     });
   }
 
@@ -60,9 +68,13 @@ export class BookingResolver {
     @CurrentUser() user: UserType,
     @Args('data') data: CreateBookingInput,
   ) {
-    const booking = await this.bookingApi.createBooking({
+    const result = await this.bookingApi.createBooking({
       userId: user.userId,
       slotId: data.slotId,
+    });
+
+    const booking = await this.bookingApi.getBooking({
+      bookingId: result.bookingId,
     });
 
     return this.stripSlot(booking);
@@ -73,9 +85,13 @@ export class BookingResolver {
     @CurrentUser() user: UserType,
     @Args('data') data: ConfirmBookingInput,
   ) {
-    const booking = await this.bookingApi.confirmBooking({
+    const result = await this.bookingApi.confirmBooking({
       ...data,
       requesterId: user.userId,
+    });
+
+    const booking = await this.bookingApi.getBooking({
+      bookingId: result.bookingId,
     });
 
     return this.stripSlot(booking);
@@ -86,9 +102,13 @@ export class BookingResolver {
     @CurrentUser() user: UserType,
     @Args('data') data: CancelBookingInput,
   ) {
-    const booking = await this.bookingApi.cancelBooking({
+    const result = await this.bookingApi.cancelBooking({
       ...data,
       requesterId: user.userId,
+    });
+
+    const booking = await this.bookingApi.getBooking({
+      bookingId: result.bookingId,
     });
 
     return this.stripSlot(booking);
@@ -99,24 +119,16 @@ export class BookingResolver {
     @CurrentUser() user: UserType,
     @Args('data') data: CompleteBookingInput,
   ) {
-    const booking = await this.bookingApi.completeBooking({
+    const result = await this.bookingApi.completeBooking({
       ...data,
       performedBy: user.userId,
     });
 
-    return this.stripSlot(booking);
-  }
+    const booking = await this.bookingApi.getBooking({
+      bookingId: result.bookingId,
+    });
 
-  private ensureAccess(
-    booking: GetBookingQueryReturnType,
-    requesterId: string,
-  ) {
-    if (
-      booking.userId !== requesterId &&
-      booking.slot.expertId !== requesterId
-    ) {
-      throw new ForbiddenException('Booking not found');
-    }
+    return this.stripSlot(booking);
   }
 
   private stripSlot(booking: GetBookingQueryReturnType): BookingModel {

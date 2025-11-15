@@ -21,6 +21,15 @@ export class ListBookingsHandler
       );
     }
 
+    // Ensure requester has access to the bookings
+    if (data.userId && data.userId !== data.requesterId) {
+      throw new BadRequestException('Cannot access other user bookings');
+    }
+
+    if (data.expertId && data.expertId !== data.requesterId) {
+      throw new BadRequestException('Cannot access other expert bookings');
+    }
+
     return getOffsetPagination({
       pageData: { first: data.first, after: data.after },
       findMany: ({ take, skip }) =>

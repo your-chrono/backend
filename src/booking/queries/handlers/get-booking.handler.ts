@@ -13,7 +13,16 @@ export class GetBookingHandler
   async execute({ data }: GetBookingQuery) {
     const booking = await this.prisma.booking.findFirst({
       where: { id: data.bookingId, isDeleted: false },
-      include: {
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        isDeleted: true,
+        status: true,
+        creditsLocked: true,
+        chatId: true,
+        userId: true,
+        slotId: true,
         slot: {
           select: { expertId: true },
         },

@@ -16,6 +16,8 @@ export class ConfirmBookingHandler
   implements ICommandHandler<ConfirmBookingCommand>
 {
   async execute({ data }: ConfirmBookingCommand) {
+    this.ensureValidExpectedVersion(data.expectedVersion);
+
     return this.runInTransaction(async () => {
       const booking = await this.findBookingOrThrow(data.bookingId);
 

@@ -44,38 +44,30 @@ export class BookingApiService {
   }
 
   async createBooking(data: CreateBookingCommandData) {
-    const result = await this.commandBus.execute<
+    return this.commandBus.execute<
       CreateBookingCommand,
       CreateBookingCommandReturnType
     >(new CreateBookingCommand(data));
-
-    return this.getBooking({ bookingId: result.bookingId });
   }
 
   async confirmBooking(data: ConfirmBookingCommandData) {
-    const result = await this.commandBus.execute<
+    return this.commandBus.execute<
       ConfirmBookingCommand,
       ConfirmBookingCommandReturnType
     >(new ConfirmBookingCommand(data));
-
-    return this.getBooking({ bookingId: result.bookingId });
   }
 
   async cancelBooking(data: CancelBookingCommandData) {
-    const result = await this.commandBus.execute<
+    return this.commandBus.execute<
       CancelBookingCommand,
       CancelBookingCommandReturnType
     >(new CancelBookingCommand(data));
-
-    return this.getBooking({ bookingId: result.bookingId });
   }
 
   async completeBooking(data: CompleteBookingCommandData) {
-    const result = await this.commandBus.execute<
+    return this.commandBus.execute<
       CompleteBookingCommand,
       CompleteBookingCommandReturnType
     >(new CompleteBookingCommand(data));
-
-    return this.getBooking({ bookingId: result.bookingId });
   }
 }

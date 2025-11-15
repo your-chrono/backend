@@ -147,6 +147,8 @@ model Booking {
 
   @@index([userId, status])
   @@index([createdAt])
+  @@index([slotId])
+  @@index([status, createdAt])
 }
 
 model Wallet {
