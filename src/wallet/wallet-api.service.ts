@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
+  CreateWalletCommand,
+  CreateWalletCommandData,
+  CreateWalletCommandReturnType,
   TopUpWalletCommand,
   TopUpWalletCommandData,
   TopUpWalletCommandReturnType,
@@ -23,6 +26,13 @@ export class WalletApiService {
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
   ) {}
+
+  async createWallet(data: CreateWalletCommandData) {
+    return this.commandBus.execute<
+      CreateWalletCommand,
+      CreateWalletCommandReturnType
+    >(new CreateWalletCommand(data));
+  }
 
   getWallet(data: GetWalletQueryData) {
     return this.queryBus.execute<GetWalletQuery, GetWalletQueryReturnType>(

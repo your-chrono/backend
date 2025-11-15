@@ -11,6 +11,7 @@ import {
 import {
   CreateSlotCommand,
   CreateSlotCommandData,
+  CreateSlotCommandReturnType,
   DeleteSlotCommand,
   DeleteSlotCommandData,
   DeleteSlotCommandReturnType,
@@ -22,6 +23,7 @@ import {
   SyncSlotsCommandReturnType,
   UpdateSlotCommand,
   UpdateSlotCommandData,
+  UpdateSlotCommandReturnType,
 } from './commands';
 
 @Injectable()
@@ -46,24 +48,18 @@ export class SlotApiService {
 
   async createSlot(
     data: CreateSlotCommandData,
-  ): Promise<GetSlotQueryReturnType> {
-    const result = await this.commandBus.execute<
-      CreateSlotCommand,
-      { slotId: string }
-    >(new CreateSlotCommand(data));
-
-    return this.getSlot({ slotId: result.slotId });
+  ): Promise<CreateSlotCommandReturnType> {
+    return this.commandBus.execute<CreateSlotCommand, { slotId: string }>(
+      new CreateSlotCommand(data),
+    );
   }
 
   async updateSlot(
     data: UpdateSlotCommandData,
-  ): Promise<GetSlotQueryReturnType> {
-    const result = await this.commandBus.execute<
-      UpdateSlotCommand,
-      { slotId: string }
-    >(new UpdateSlotCommand(data));
-
-    return this.getSlot({ slotId: result.slotId });
+  ): Promise<UpdateSlotCommandReturnType> {
+    return this.commandBus.execute<UpdateSlotCommand, { slotId: string }>(
+      new UpdateSlotCommand(data),
+    );
   }
 
   deleteSlot(data: DeleteSlotCommandData) {
@@ -80,14 +76,10 @@ export class SlotApiService {
     >(new SyncSlotsCommand(data));
   }
 
-  async setSlotBookingState(
-    data: SetSlotBookingStateCommandData,
-  ): Promise<GetSlotQueryReturnType> {
-    const result = await this.commandBus.execute<
+  async setSlotBookingState(data: SetSlotBookingStateCommandData) {
+    return this.commandBus.execute<
       SetSlotBookingStateCommand,
       SetSlotBookingStateCommandReturnType
     >(new SetSlotBookingStateCommand(data));
-
-    return this.getSlot({ slotId: result.slotId });
   }
 }

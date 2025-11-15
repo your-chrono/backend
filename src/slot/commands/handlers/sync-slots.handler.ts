@@ -130,6 +130,7 @@ export class SyncSlotsHandler
     for (const slot of data.slots) {
       this.ensureTimeRange(slot.startTime, slot.endTime);
       this.ensurePrice(slot.price);
+      this.ensureDescription(slot.description);
 
       if (slot.startTime < data.window.from || slot.endTime > data.window.to) {
         throw new BadRequestException('Slot is outside of provided window');

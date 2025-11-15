@@ -15,6 +15,9 @@ import {
   ResolveTagsByProfileIdQueryReturnType,
 } from './queries/impl';
 import {
+  CreateProfileCommand,
+  CreateProfileCommandData,
+  CreateProfileCommandReturnType,
   UpdateProfileCommand,
   UpdateProfileCommandData,
   UpdateProfileCommandReturnType,
@@ -53,12 +56,17 @@ export class UserApiService {
     );
   }
 
+  async createProfile(data: CreateProfileCommandData) {
+    return this.commandBus.execute<
+      CreateProfileCommand,
+      CreateProfileCommandReturnType
+    >(new CreateProfileCommand(data));
+  }
+
   async updateProfile(data: UpdateProfileCommandData) {
-    const result = await this.commandBus.execute<
+    return this.commandBus.execute<
       UpdateProfileCommand,
       UpdateProfileCommandReturnType
     >(new UpdateProfileCommand(data));
-
-    return this.getUserById({ userId: result.userId });
   }
 }

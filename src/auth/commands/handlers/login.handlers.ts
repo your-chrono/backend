@@ -41,6 +41,9 @@ export class LoginHandler
   }
 
   private async createUser(email: string) {
+    // await walletApiService.createWallet({ userId: user.id });
+    // await userApiService.createProfile({ userId: user.id });
+
     return this.prisma.user.create({
       data: {
         email,

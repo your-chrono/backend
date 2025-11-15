@@ -15,11 +15,12 @@ export class CompleteBookingHandler
   implements ICommandHandler<CompleteBookingCommand>
 {
   async execute({ data }: CompleteBookingCommand) {
+    this.ensureValidExpectedVersion(data.expectedVersion);
+
     return this.runInTransaction(async () => {
       const booking = await this.findBookingOrThrow(data.bookingId);
 
       if (
-        data.performedBy &&
         data.performedBy !== booking.userId &&
         data.performedBy !== booking.slot.expertId
       ) {

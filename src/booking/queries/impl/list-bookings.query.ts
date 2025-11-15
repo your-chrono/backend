@@ -9,6 +9,7 @@ export class ListBookingsQuery {
       readonly status?: BookingStatus;
       readonly first: number;
       readonly after?: string;
+      readonly requesterId: string;
     },
   ) {}
 }

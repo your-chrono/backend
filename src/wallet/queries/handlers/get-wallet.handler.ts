@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { PrismaService } from '../../../database';
 import { GetWalletQuery, GetWalletQueryReturnType } from '../impl';
@@ -11,10 +11,16 @@ export class GetWalletHandler
   constructor(private readonly prisma: PrismaService) {}
 
   async execute({ data }: GetWalletQuery) {
-    return this.prisma.wallet.upsert({
+    const wallet = await this.prisma.wallet.findUnique({
       where: { userId: data.userId },
-      update: {},
-      create: { userId: data.userId },
     });
+
+    if (!wallet) {
+      throw new NotFoundException(
+        'Wallet not found. Please contact support to create your wallet.',
+      );
+    }
+
+    return wallet;
   }
 }

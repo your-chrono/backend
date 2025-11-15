@@ -11,6 +11,7 @@ import {
   UpdateProfileCommandData,
   UpdateProfileCommandReturnType,
 } from '../impl';
+import { MAX_PRICE_PER_HOUR } from '../../../shared/constants';
 
 @Injectable()
 @CommandHandler(UpdateProfileCommand)
@@ -26,7 +27,7 @@ export class UpdateProfileHandler
     this.ensurePayload(data);
 
     return this.transaction.run(() => this.persistProfile(data), {
-      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead,
     });
   }
 
@@ -43,14 +44,26 @@ export class UpdateProfileHandler
       throw new BadRequestException('No profile data provided');
     }
 
-    if (
-      data.pricePerHour !== undefined &&
-      data.pricePerHour !== null &&
-      data.pricePerHour < 0
-    ) {
-      throw new BadRequestException(
-        'Price per hour must be a positive number or null',
-      );
+    if (data.pricePerHour !== undefined && data.pricePerHour !== null) {
+      if (data.pricePerHour < 0) {
+        throw new BadRequestException(
+          'Price per hour must be a positive number or null',
+        );
+      }
+
+      if (data.pricePerHour > MAX_PRICE_PER_HOUR) {
+        throw new BadRequestException(
+          'Price per hour exceeds maximum limit of 1,000,000 credits',
+        );
+      }
+
+      if (!Number.isInteger(data.pricePerHour)) {
+        throw new BadRequestException('Price per hour must be an integer');
+      }
+
+      if (!Number.isFinite(data.pricePerHour)) {
+        throw new BadRequestException('Price per hour must be a finite number');
+      }
     }
   }
 
@@ -66,26 +79,33 @@ export class UpdateProfileHandler
       throw new NotFoundException('User not found');
     }
 
+    // Проверка существования профиля
+    const profile = await this.prisma.profile.findFirst({
+      where: { userId: data.userId, isDeleted: false },
+      select: { id: true },
+    });
+
+    if (!profile) {
+      throw new NotFoundException(
+        'Profile not found. Please create profile first using createProfile command.',
+      );
+    }
+
+    // Подготовка данных для обновления
     const patch: Prisma.ProfileUncheckedUpdateInput = {};
-    const createData: Prisma.ProfileUncheckedCreateInput = {
-      userId: data.userId,
-    };
 
     if (data.bio !== undefined) {
       patch.bio = data.bio;
-      createData.bio = data.bio ?? null;
     }
 
     if (data.pricePerHour !== undefined) {
       patch.pricePerHour = data.pricePerHour;
-      createData.pricePerHour = data.pricePerHour ?? null;
     }
 
-    const profile = await this.prisma.profile.upsert({
-      where: { userId: data.userId },
-      update: patch,
-      create: createData,
-      select: { id: true },
+    // Обновление профиля
+    await this.prisma.profile.update({
+      where: { id: profile.id },
+      data: patch,
     });
 
     if (data.tagIds) {

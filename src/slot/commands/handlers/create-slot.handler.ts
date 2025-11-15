@@ -12,6 +12,7 @@ export class CreateSlotHandler
   async execute({ data }: CreateSlotCommand) {
     this.ensureTimeRange(data.startTime, data.endTime);
     this.ensurePrice(data.price);
+    this.ensureDescription(data.description);
 
     return this.runInTransaction(async () => {
       await this.ensureExpertExists(data.expertId);

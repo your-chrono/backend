@@ -1,5 +1,5 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UseGuards, ForbiddenException } from '@nestjs/common';
+import { UseGuards, NotFoundException } from '@nestjs/common';
 import { SlotApiService } from '../../slot/slot-api.service';
 import {
   CreateSlotInput,
@@ -27,10 +27,10 @@ export class SlotResolver {
 
   @Query(() => SlotModel)
   async slot(@CurrentUser() user: UserType, @Args('data') data: GetSlotInput) {
-    const slot = await this.slotApi.getSlot(data);
+    const slot = await this.slotApi.getSlot(data).catch(() => null);
 
-    if (slot.expertId !== user.userId) {
-      throw new ForbiddenException('Slot not found');
+    if (!slot || slot.expertId !== user.userId) {
+      throw new NotFoundException('Slot not found');
     }
 
     return slot;
@@ -42,25 +42,27 @@ export class SlotResolver {
   }
 
   @Mutation(() => SlotModel)
-  createMySlot(
+  async createMySlot(
     @CurrentUser() user: UserType,
     @Args('data') data: CreateSlotInput,
   ) {
-    return this.slotApi.createSlot({
+    const result = await this.slotApi.createSlot({
       expertId: user.userId,
       ...data,
     });
+    return this.slotApi.getSlot({ slotId: result.slotId });
   }
 
   @Mutation(() => SlotModel)
-  updateMySlot(
+  async updateMySlot(
     @CurrentUser() user: UserType,
     @Args('data') data: UpdateSlotInput,
   ) {
-    return this.slotApi.updateSlot({
+    const result = await this.slotApi.updateSlot({
       expertId: user.userId,
       ...data,
     });
+    return this.slotApi.getSlot({ slotId: result.slotId });
   }
 
   @Mutation(() => SlotMutationPayload)
@@ -86,7 +88,9 @@ export class SlotResolver {
   }
 
   @Mutation(() => SlotModel)
-  setSlotBookingState(@Args('data') data: SetSlotBookingStateInput) {
-    return this.slotApi.setSlotBookingState(data);
+  async setSlotBookingState(@Args('data') data: SetSlotBookingStateInput) {
+    const result = await this.slotApi.setSlotBookingState(data);
+
+    return this.slotApi.getSlot({ slotId: result.slotId });
   }
 }

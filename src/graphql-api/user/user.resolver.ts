@@ -41,10 +41,11 @@ export class UserResolver {
   }
 
   @Mutation(() => UserModel)
-  updateMyProfile(
+  async updateMyProfile(
     @CurrentUser() user: UserType,
     @Args('data') data: UpdateProfileInput,
   ) {
-    return this.userApi.updateProfile({ userId: user.userId, ...data });
+    await this.userApi.updateProfile({ userId: user.userId, ...data });
+    return this.userApi.getUserById({ userId: user.userId });
   }
 }

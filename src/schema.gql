@@ -197,6 +197,11 @@ type Mutation {
   withdrawMyWallet(data: WithdrawWalletInput!): WalletModel!
 }
 
+input NumberIntervalInput {
+  from: Int
+  to: Int
+}
+
 type PageInfo {
   endCursor: String
   hasNextPage: Boolean!
@@ -423,7 +428,10 @@ type UserModelEdge {
 input UsersInput {
   after: String
   first: Int!
+  pricePerHour: NumberIntervalInput
+  rating: NumberIntervalInput
   search: String
+  tagGroups: [TagGroup!]
 }
 
 type WalletModel {

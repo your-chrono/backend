@@ -26,6 +26,8 @@ model User {
   bookings Booking[] @relation("UserBookings")
   slots    Slot[]    @relation("ExpertSlots")
   messages Message[]
+
+  @@index([email])
 }
 
 model Role {
@@ -68,6 +70,7 @@ model Profile {
   tags ProfileTag[]
 
   @@index([verified, pricePerHour])
+  @@index([bio])
 }
 
 model Tag {
@@ -144,6 +147,8 @@ model Booking {
 
   @@index([userId, status])
   @@index([createdAt])
+  @@index([slotId])
+  @@index([status, createdAt])
 }
 
 model Wallet {
@@ -172,6 +177,8 @@ model Transaction {
   booking          Booking? @relation(fields: [relatedBookingId], references: [id])
 
   @@index([walletId, createdAt])
+  @@index([relatedBookingId])
+  @@index([relatedBookingId, type])
 }
 
 model Chat {

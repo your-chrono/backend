@@ -15,6 +15,8 @@ export class CancelBookingHandler
   implements ICommandHandler<CancelBookingCommand>
 {
   async execute({ data }: CancelBookingCommand) {
+    this.ensureValidExpectedVersion(data.expectedVersion);
+
     return this.runInTransaction(async () => {
       const booking = await this.findBookingOrThrow(data.bookingId);
 

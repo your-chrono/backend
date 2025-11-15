@@ -6,6 +6,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GraphqlApiModule } from './graphql-api/graphql-api.module';
 import { AuthModule } from './auth/auth.module';
+import { NotificationsModule } from './notifications';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthModule } from './auth/auth.module';
     ConfigModule.forRoot(),
     HealthModule,
     AuthModule,
+    NotificationsModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

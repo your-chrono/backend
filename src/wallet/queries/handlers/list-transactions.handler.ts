@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { PrismaService } from '../../../database';
 import {
   ListTransactionsQuery,
   ListTransactionsQueryReturnType,
 } from '../impl';
-import { getOffsetPagination } from '../../../shared/utils/getOffsetPagination';
+import { getOffsetPagination } from '../../../shared';
 
 @Injectable()
 @QueryHandler(ListTransactionsQuery)
@@ -16,12 +16,16 @@ export class ListTransactionsHandler
   constructor(private readonly prisma: PrismaService) {}
 
   async execute({ data }: ListTransactionsQuery) {
-    const wallet = await this.prisma.wallet.upsert({
+    const wallet = await this.prisma.wallet.findUnique({
       where: { userId: data.userId },
-      update: {},
-      create: { userId: data.userId },
       select: { id: true },
     });
+
+    if (!wallet) {
+      throw new NotFoundException(
+        'Wallet not found. Please contact support to create your wallet.',
+      );
+    }
 
     const where = {
       walletId: wallet.id,

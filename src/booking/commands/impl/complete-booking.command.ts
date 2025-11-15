@@ -2,7 +2,7 @@ export class CompleteBookingCommand {
   constructor(
     public readonly data: {
       readonly bookingId: string;
-      readonly performedBy?: string;
+      readonly performedBy: string;
       readonly expectedVersion?: Date;
     },
   ) {}
