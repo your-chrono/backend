@@ -7,6 +7,7 @@ import { BookingStatus } from '@prisma/client';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateBookingCommand } from '../impl';
 import { BaseBookingHandler } from './base-booking.handler';
+import { MILLISECONDS_IN_HOUR } from '../../../shared/constants';
 
 @Injectable()
 @CommandHandler(CreateBookingCommand)
@@ -36,7 +37,7 @@ export class CreateBookingHandler
       }
 
       // Minimum 1 hour before slot start
-      const minBookingTime = 60 * 60 * 1000; // 1 hour
+      const minBookingTime = MILLISECONDS_IN_HOUR; // 1 hour
       const timeUntilStart = slot.startTime.getTime() - now.getTime();
       if (timeUntilStart < minBookingTime) {
         throw new BadRequestException(

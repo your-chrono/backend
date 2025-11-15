@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateSlotCommand, UpdateSlotCommandData } from '../impl';
 import { BaseSlotHandler } from './base-slot.handler';
+import { MILLISECONDS_IN_WORKING_DAY } from '../../../shared/constants';
 
 @Injectable()
 @CommandHandler(UpdateSlotCommand)
@@ -49,7 +50,7 @@ export class UpdateSlotHandler
       }
 
       // Validate duration
-      const maxDuration = 8 * 60 * 60 * 1000;
+      const maxDuration = MILLISECONDS_IN_WORKING_DAY;
       const duration = nextEndTime.getTime() - nextStartTime.getTime();
       if (duration > maxDuration) {
         throw new BadRequestException(

@@ -8,6 +8,11 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Prisma } from '@prisma/client';
 import { TransactionPrismaService } from '../../../database/transaction-prisma.service';
 import { CreateProfileCommand, CreateProfileCommandReturnType } from '../impl';
+import {
+  MAX_PRICE_PER_HOUR,
+  MIN_PRICE_PER_HOUR,
+  MIN_BALANCE_THRESHOLD,
+} from '../../../shared/constants';
 
 @Injectable()
 @CommandHandler(CreateProfileCommand)
@@ -39,7 +44,7 @@ export class CreateProfileHandler
         );
       }
 
-      if (data.pricePerHour > 1_000_000) {
+      if (data.pricePerHour > MAX_PRICE_PER_HOUR) {
         throw new BadRequestException(
           'Price per hour exceeds maximum limit of 1,000,000 credits',
         );
@@ -55,11 +60,11 @@ export class CreateProfileHandler
     }
 
     if (data.bio !== undefined && data.bio !== null) {
-      if (data.bio.length > 1000) {
+      if (data.bio.length > MIN_PRICE_PER_HOUR) {
         throw new BadRequestException('Bio must be less than 1000 characters');
       }
 
-      if (data.bio.length < 10) {
+      if (data.bio.length < MIN_BALANCE_THRESHOLD) {
         throw new BadRequestException('Bio must be at least 10 characters');
       }
     }

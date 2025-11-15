@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { TransactionType } from '@prisma/client';
 import { TransactionPrismaClient } from '../../database/transaction-prisma.service';
+import { MAX_PRICE_PER_HOUR } from '../../shared/constants';
 
 @Injectable()
 export class WalletLedgerService {
   private readonly logger = new Logger(WalletLedgerService.name);
-  private readonly MAX_TRANSACTION_AMOUNT = 1_000_000; // 1M credits max per transaction
+  private readonly MAX_TRANSACTION_AMOUNT = MAX_PRICE_PER_HOUR; // 1M credits max per transaction
 
   async ensureWallet(
     prisma: TransactionPrismaClient,

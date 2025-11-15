@@ -11,6 +11,7 @@ import {
   UpdateProfileCommandData,
   UpdateProfileCommandReturnType,
 } from '../impl';
+import { MAX_PRICE_PER_HOUR } from '../../../shared/constants';
 
 @Injectable()
 @CommandHandler(UpdateProfileCommand)
@@ -50,7 +51,7 @@ export class UpdateProfileHandler
         );
       }
 
-      if (data.pricePerHour > 1_000_000) {
+      if (data.pricePerHour > MAX_PRICE_PER_HOUR) {
         throw new BadRequestException(
           'Price per hour exceeds maximum limit of 1,000,000 credits',
         );

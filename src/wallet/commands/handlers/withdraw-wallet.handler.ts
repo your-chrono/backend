@@ -3,6 +3,7 @@ import { TransactionType } from '@prisma/client';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { WithdrawWalletCommand } from '../impl';
 import { BaseWalletHandler } from './base-wallet.handler';
+import { MIN_WITHDRAWAL_AMOUNT } from '../../../shared/constants';
 
 @Injectable()
 @CommandHandler(WithdrawWalletCommand)
@@ -11,7 +12,7 @@ export class WithdrawWalletHandler
   implements ICommandHandler<WithdrawWalletCommand>
 {
   private readonly logger = new Logger(WithdrawWalletHandler.name);
-  private readonly DAILY_WITHDRAWAL_LIMIT = 100_000; // 100k credits per day
+  private readonly DAILY_WITHDRAWAL_LIMIT = MIN_WITHDRAWAL_AMOUNT; // 100k credits per day
 
   async execute({ data }: WithdrawWalletCommand) {
     this.ledger.ensureValidAmount(data.amount);

@@ -5,6 +5,12 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { TransactionPrismaService } from '../../../database/transaction-prisma.service';
+import {
+  MILLISECONDS_IN_WORKING_DAY,
+  MAX_PRICE_PER_HOUR,
+  MIN_TAGS_COUNT,
+  MAX_SLOTS_PER_SYNC,
+} from '../../../shared/constants';
 
 @Injectable()
 export abstract class BaseSlotHandler {
@@ -64,7 +70,7 @@ export abstract class BaseSlotHandler {
     }
 
     // Maximum slot duration: 8 hours
-    const maxDuration = 8 * 60 * 60 * 1000;
+    const maxDuration = MILLISECONDS_IN_WORKING_DAY;
     const duration = endTime.getTime() - startTime.getTime();
 
     if (duration > maxDuration) {
@@ -79,7 +85,7 @@ export abstract class BaseSlotHandler {
       throw new BadRequestException('price must be a non-negative number');
     }
 
-    if (price > 1_000_000) {
+    if (price > MAX_PRICE_PER_HOUR) {
       throw new BadRequestException(
         'price exceeds maximum limit of 1,000,000 credits',
       );
@@ -92,13 +98,13 @@ export abstract class BaseSlotHandler {
 
   protected ensureDescription(description?: string) {
     if (description !== undefined && description !== null && description !== '') {
-      if (description.length < 3) {
+      if (description.length < MIN_TAGS_COUNT) {
         throw new BadRequestException(
           'description must be at least 3 characters',
         );
       }
 
-      if (description.length > 500) {
+      if (description.length > MAX_SLOTS_PER_SYNC) {
         throw new BadRequestException(
           'description cannot exceed 500 characters',
         );
