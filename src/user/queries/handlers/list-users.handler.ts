@@ -76,7 +76,7 @@ export class ListUsersHandler implements IQueryHandler<ListUsersQuery> {
     if (tagGroups && tagGroups.length > 0) {
       profileWhere.tags = {
         some: {
-          tag: {
+          tags: {
             group: { in: tagGroups },
             isDeleted: false,
           },
