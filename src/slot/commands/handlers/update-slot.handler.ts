@@ -22,10 +22,47 @@ export class UpdateSlotHandler
       const nextStartTime = data.startTime ?? slot.startTime;
       const nextEndTime = data.endTime ?? slot.endTime;
 
-      this.ensureTimeRange(nextStartTime, nextEndTime);
+      // Validate dates are valid
+      if (data.startTime !== undefined) {
+        if (!data.startTime || isNaN(data.startTime.getTime())) {
+          throw new BadRequestException('startTime must be a valid date');
+        }
+      }
+
+      if (data.endTime !== undefined) {
+        if (!data.endTime || isNaN(data.endTime.getTime())) {
+          throw new BadRequestException('endTime must be a valid date');
+        }
+      }
+
+      // Validate new startTime is not in the past (only if changing)
+      if (data.startTime !== undefined) {
+        const now = new Date();
+        if (data.startTime < now) {
+          throw new BadRequestException('startTime cannot be in the past');
+        }
+      }
+
+      // Validate time range
+      if (nextStartTime >= nextEndTime) {
+        throw new BadRequestException('startTime must be before endTime');
+      }
+
+      // Validate duration
+      const maxDuration = 8 * 60 * 60 * 1000;
+      const duration = nextEndTime.getTime() - nextStartTime.getTime();
+      if (duration > maxDuration) {
+        throw new BadRequestException(
+          'Slot duration cannot exceed 8 hours',
+        );
+      }
 
       if (data.price !== undefined) {
         this.ensurePrice(data.price);
+      }
+
+      if (data.description !== undefined) {
+        this.ensureDescription(data.description);
       }
 
       if (data.startTime !== undefined || data.endTime !== undefined) {

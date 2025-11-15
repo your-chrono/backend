@@ -16,7 +16,7 @@ export abstract class BaseSlotHandler {
 
   protected runInTransaction<T>(handler: () => Promise<T>) {
     return this.transaction.run(handler, {
-      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead,
     });
   }
 
@@ -44,14 +44,65 @@ export abstract class BaseSlotHandler {
   }
 
   protected ensureTimeRange(startTime: Date, endTime: Date) {
+    // Validate dates are valid
+    if (!startTime || isNaN(startTime.getTime())) {
+      throw new BadRequestException('startTime must be a valid date');
+    }
+
+    if (!endTime || isNaN(endTime.getTime())) {
+      throw new BadRequestException('endTime must be a valid date');
+    }
+
+    const now = new Date();
+
+    if (startTime < now) {
+      throw new BadRequestException('startTime cannot be in the past');
+    }
+
     if (startTime >= endTime) {
       throw new BadRequestException('startTime must be before endTime');
+    }
+
+    // Maximum slot duration: 8 hours
+    const maxDuration = 8 * 60 * 60 * 1000;
+    const duration = endTime.getTime() - startTime.getTime();
+
+    if (duration > maxDuration) {
+      throw new BadRequestException(
+        'Slot duration cannot exceed 8 hours',
+      );
     }
   }
 
   protected ensurePrice(price: number) {
     if (!Number.isFinite(price) || price < 0) {
       throw new BadRequestException('price must be a non-negative number');
+    }
+
+    if (price > 1_000_000) {
+      throw new BadRequestException(
+        'price exceeds maximum limit of 1,000,000 credits',
+      );
+    }
+
+    if (!Number.isInteger(price)) {
+      throw new BadRequestException('price must be an integer');
+    }
+  }
+
+  protected ensureDescription(description?: string) {
+    if (description !== undefined && description !== null && description !== '') {
+      if (description.length < 3) {
+        throw new BadRequestException(
+          'description must be at least 3 characters',
+        );
+      }
+
+      if (description.length > 500) {
+        throw new BadRequestException(
+          'description cannot exceed 500 characters',
+        );
+      }
     }
   }
 
