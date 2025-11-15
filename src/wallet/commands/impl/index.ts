@@ -1,3 +1,4 @@
+export * from './create-wallet.command';
 export * from './top-up-wallet.command';
 export * from './withdraw-wallet.command';
 export * from './lock-credits.command';

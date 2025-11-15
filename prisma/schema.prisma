@@ -172,6 +172,8 @@ model Transaction {
   booking          Booking? @relation(fields: [relatedBookingId], references: [id])
 
   @@index([walletId, createdAt])
+  @@index([relatedBookingId])
+  @@index([relatedBookingId, type])
 }
 
 model Chat {

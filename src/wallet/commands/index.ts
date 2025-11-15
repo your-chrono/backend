@@ -1,4 +1,5 @@
 import {
+  CreateWalletHandler,
   LockCreditsHandler,
   ReleaseCreditsHandler,
   RefundCreditsHandler,
@@ -7,6 +8,7 @@ import {
 } from './handlers';
 
 export const WALLET_COMMANDS = [
+  CreateWalletHandler,
   TopUpWalletHandler,
   WithdrawWalletHandler,
   LockCreditsHandler,
