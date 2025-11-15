@@ -2,7 +2,6 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
@@ -16,8 +15,6 @@ export class CreateProfileHandler
   implements
     ICommandHandler<CreateProfileCommand, CreateProfileCommandReturnType>
 {
-  private readonly logger = new Logger(CreateProfileHandler.name);
-
   constructor(private readonly transaction: TransactionPrismaService) {}
 
   async execute({
@@ -25,13 +22,8 @@ export class CreateProfileHandler
   }: CreateProfileCommand): Promise<CreateProfileCommandReturnType> {
     this.validateInput(data);
 
-    this.logger.log({
-      action: 'CREATE_PROFILE_ATTEMPT',
-      userId: data.userId,
-    });
-
     return this.transaction.run(() => this.createProfile(data), {
-      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead,
     });
   }
 
@@ -83,11 +75,6 @@ export class CreateProfileHandler
     });
 
     if (!user) {
-      this.logger.warn({
-        action: 'CREATE_PROFILE_FAILED',
-        userId: data.userId,
-        reason: 'User not found',
-      });
       throw new NotFoundException('User not found');
     }
 
@@ -97,11 +84,6 @@ export class CreateProfileHandler
     });
 
     if (existingProfile) {
-      this.logger.warn({
-        action: 'CREATE_PROFILE_FAILED',
-        userId: data.userId,
-        reason: 'Profile already exists',
-      });
       throw new ConflictException('Profile already exists for this user');
     }
 
@@ -113,12 +95,6 @@ export class CreateProfileHandler
         pricePerHour: data.pricePerHour ?? null,
       },
       select: { id: true, userId: true },
-    });
-
-    this.logger.log({
-      action: 'CREATE_PROFILE_SUCCESS',
-      userId: data.userId,
-      profileId: profile.id,
     });
 
     return {

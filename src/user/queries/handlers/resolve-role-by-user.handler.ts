@@ -23,8 +23,14 @@ export class ResolveRoleByUserHandler
       throw new NotFoundException('User not found');
     }
 
-    return this.prisma.role.findUniqueOrThrow({
+    const role = await this.prisma.role.findUnique({
       where: { id: user.roleId },
     });
+
+    if (!role) {
+      throw new NotFoundException('Role not found');
+    }
+
+    return role;
   }
 }

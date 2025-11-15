@@ -60,35 +60,17 @@ export class ListUsersHandler implements IQueryHandler<ListUsersQuery> {
     const profileWhere: Prisma.ProfileWhereInput = {};
 
     if (rating?.from !== undefined || rating?.to !== undefined) {
-      const ratingFilter: Prisma.FloatFilter = {};
-
-      if (rating.from !== undefined) {
-        ratingFilter.gte = rating.from;
-      }
-
-      if (rating.to !== undefined) {
-        ratingFilter.lte = rating.to;
-      }
-
-      if (Object.keys(ratingFilter).length > 0) {
-        profileWhere.rating = ratingFilter;
-      }
+      profileWhere.rating = {
+        ...(rating.from !== undefined && { gte: rating.from }),
+        ...(rating.to !== undefined && { lte: rating.to }),
+      };
     }
 
     if (pricePerHour?.from !== undefined || pricePerHour?.to !== undefined) {
-      const priceFilter: Prisma.IntFilter = {};
-
-      if (pricePerHour.from !== undefined) {
-        priceFilter.gte = pricePerHour.from;
-      }
-
-      if (pricePerHour.to !== undefined) {
-        priceFilter.lte = pricePerHour.to;
-      }
-
-      if (Object.keys(priceFilter).length > 0) {
-        profileWhere.pricePerHour = priceFilter;
-      }
+      profileWhere.pricePerHour = {
+        ...(pricePerHour.from !== undefined && { gte: pricePerHour.from }),
+        ...(pricePerHour.to !== undefined && { lte: pricePerHour.to }),
+      };
     }
 
     if (tagGroups && tagGroups.length > 0) {

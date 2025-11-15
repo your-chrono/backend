@@ -64,11 +64,9 @@ export class UserApiService {
   }
 
   async updateProfile(data: UpdateProfileCommandData) {
-    const result = await this.commandBus.execute<
+    return this.commandBus.execute<
       UpdateProfileCommand,
       UpdateProfileCommandReturnType
     >(new UpdateProfileCommand(data));
-
-    return this.getUserById({ userId: result.userId });
   }
 }
