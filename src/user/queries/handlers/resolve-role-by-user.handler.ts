@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { PrismaService } from 'src/database/prisma.service';
 import {
@@ -12,11 +13,18 @@ export class ResolveRoleByUserHandler
 {
   constructor(private readonly prisma: PrismaService) {}
 
-  public execute({ data }: ResolveRoleByUserQuery) {
-    return this.prisma.user
-      .findUniqueOrThrow({
-        where: { id: data.userId },
-      })
-      .role();
+  public async execute({ data }: ResolveRoleByUserQuery) {
+    const user = await this.prisma.user.findFirst({
+      where: { id: data.userId, isDeleted: false },
+      select: { roleId: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return this.prisma.role.findUniqueOrThrow({
+      where: { id: user.roleId },
+    });
   }
 }

@@ -15,6 +15,9 @@ import {
   ResolveTagsByProfileIdQueryReturnType,
 } from './queries/impl';
 import {
+  CreateProfileCommand,
+  CreateProfileCommandData,
+  CreateProfileCommandReturnType,
   UpdateProfileCommand,
   UpdateProfileCommandData,
   UpdateProfileCommandReturnType,
@@ -51,6 +54,13 @@ export class UserApiService {
     return this.queryBus.execute<ListUsersQuery, ListUsersQueryReturnType>(
       new ListUsersQuery(data),
     );
+  }
+
+  async createProfile(data: CreateProfileCommandData) {
+    return this.commandBus.execute<
+      CreateProfileCommand,
+      CreateProfileCommandReturnType
+    >(new CreateProfileCommand(data));
   }
 
   async updateProfile(data: UpdateProfileCommandData) {

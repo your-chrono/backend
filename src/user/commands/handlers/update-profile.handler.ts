@@ -43,14 +43,26 @@ export class UpdateProfileHandler
       throw new BadRequestException('No profile data provided');
     }
 
-    if (
-      data.pricePerHour !== undefined &&
-      data.pricePerHour !== null &&
-      data.pricePerHour < 0
-    ) {
-      throw new BadRequestException(
-        'Price per hour must be a positive number or null',
-      );
+    if (data.pricePerHour !== undefined && data.pricePerHour !== null) {
+      if (data.pricePerHour < 0) {
+        throw new BadRequestException(
+          'Price per hour must be a positive number or null',
+        );
+      }
+
+      if (data.pricePerHour > 1_000_000) {
+        throw new BadRequestException(
+          'Price per hour exceeds maximum limit of 1,000,000 credits',
+        );
+      }
+
+      if (!Number.isInteger(data.pricePerHour)) {
+        throw new BadRequestException('Price per hour must be an integer');
+      }
+
+      if (!Number.isFinite(data.pricePerHour)) {
+        throw new BadRequestException('Price per hour must be a finite number');
+      }
     }
   }
 

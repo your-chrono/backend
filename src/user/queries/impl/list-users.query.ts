@@ -1,5 +1,5 @@
 import { IPaginatedType } from '../../../shared';
-import { User } from '@prisma/client';
+import { Prisma, TagGroup, User } from '@prisma/client';
 
 export class ListUsersQuery {
   constructor(
@@ -7,6 +7,12 @@ export class ListUsersQuery {
       readonly search?: string;
       readonly first: number;
       readonly after?: string;
+
+      readonly rating?: { readonly from?: number; to?: number };
+      readonly pricePerHour?: { readonly from?: number; to?: number };
+      readonly tagGroups?: TagGroup[];
+
+      readonly orderBy?: Prisma.UserFindManyArgs['orderBy'];
     },
   ) {}
 }

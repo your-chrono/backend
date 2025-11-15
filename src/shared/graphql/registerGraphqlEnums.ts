@@ -1,4 +1,9 @@
-import { BookingStatus, SlotFormat, TagGroup, TransactionType } from '@prisma/client';
+import {
+  BookingStatus,
+  SlotFormat,
+  TagGroup,
+  TransactionType,
+} from '@prisma/client';
 import { registerEnumType } from '@nestjs/graphql';
 
 export const registerGraphqlEnums = () => {
